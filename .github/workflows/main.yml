@@ -27,3 +27,11 @@ jobs:
         sleep 5
     - name: Build Docker Image
       run: docker build -t myapp .
+    - name: Login to ACR
+      run: echo ${{ secrets.ACR_PASSWORD }} | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+
+    - name: Tag Image
+      run: docker tag myapp ${{ secrets.ACR_LOGIN_SERVER }}/myapp:v1
+
+    - name: Push Image
+      run: docker push ${{ secrets.ACR_LOGIN_SERVER }}/myapp:v1
