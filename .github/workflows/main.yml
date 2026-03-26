@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: Full CI/CD Pipeline
 
 on:
   push:
@@ -26,6 +26,27 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
 
+    - name: Run tests
+      run: |
+        python app.py &
+        sleep 5
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    # Deploy only when code is in main branch
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: devops-prasanth-app
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
     - name: Run basic test
       run: |
         python app.py &
